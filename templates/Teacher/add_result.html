@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .result-grid {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
+        grid-gap: 24px;
+    }
+    .result-secondary-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+        grid-gap: 24px;
+    }
+    @media (max-width: 991px) {
+        .result-grid,
+        .result-secondary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        grid-gap: 15px;
+        margin-bottom: 16px;
+    }
+    .filter-tile {
+        border: 1px solid rgba(79, 70, 229, 0.15);
+        border-radius: 12px;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-column-gap: 14px;
+        align-items: center;
+        min-height: 100px;
+        background: #f8f9ff;
+    }
+    .filter-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #eef2ff;
+        color: #4f46e5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+    .filter-tile label {
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+</style>
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title mb-2">Add Result</h3>
+                <ul class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'teacher_dashboard' %}">Dashboard</a></li>
+                    <li class="breadcrumb-item active">Add Result</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-grid mb-4">
+        <div>
+            <div class="card shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">1. Select Class & Session</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="mb-0">
+                        <div class="filter-row">
+                            <div class="filter-tile">
+                                <span class="filter-icon"><i class="fas fa-chalkboard"></i></span>
+                                <div>
+                                    <label>Class <span class="text-danger">*</span></label>
+                                    <select name="klass" class="form-control" required>
+                                        <option value="">Choose class</option>
+                                        {% for klass in classes %}
+                                            <option value="{{ klass.id }}" {% if klass.id == selected_class_id %}selected{% endif %}>
+                                                {{ klass.name }} ({{ klass.class_code }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-tile">
+                                <span class="filter-icon"><i class="fas fa-layer-group"></i></span>
+                                <div>
+                                    <label>Section</label>
+                                    <select name="section" class="form-control">
+                                        <option value="">All sections</option>
+                                        {% for section in sections %}
+                                            <option value="{{ section.id }}" {% if section.id == selected_section_id %}selected{% endif %}>
+                                                {{ section.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-tile">
+                                <span class="filter-icon"><i class="fas fa-calendar-alt"></i></span>
+                                <div>
+                                    <label>Session <span class="text-danger">*</span></label>
+                                    <select name="session" class="form-control" required>
+                                        <option value="">Choose session</option>
+                                        {% for sess in sessions %}
+                                            <option value="{{ sess.id }}" {% if sess.id == selected_session_id %}selected{% endif %}>
+                                                {{ sess.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-users mr-1"></i>Load Students
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% if selected_class or selected_session %}
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase mb-3">Current Selection</h6>
+                    <p class="mb-2"><strong>Class:</strong> {{ selected_class.name|default:"—" }}</p>
+                    <p class="mb-2"><strong>Section:</strong> {{ selected_section.name|default:"All" }}</p>
+                    <p class="mb-0"><strong>Session:</strong> {{ selected_session.name|default:"—" }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div>
+            {% if students %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-1">2. Enter Marks <small class="text-muted">({{ students|length }} students)</small></h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="klass" value="{{ selected_class_id|default:'' }}">
+                        <input type="hidden" name="section" value="{{ selected_section_id|default:'' }}">
+                        <input type="hidden" name="session" value="{{ selected_session_id|default:'' }}">
+
+                        <div class="form-row">
+                            <div class="form-group col-md-5">
+                                <label class="font-weight-semibold">Subject <span class="text-danger">*</span></label>
+                                <select name="subject" class="form-control" required>
+                                    <option value="">Choose subject</option>
+                                    {% for subject in subjects %}
+                                        <option value="{{ subject.id }}" {% if subject.id == selected_subject_id %}selected{% endif %}>
+                                            {{ subject.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label class="font-weight-semibold">Exam Type <span class="text-danger">*</span></label>
+                                <select name="exam_type" class="form-control" required>
+                                    <option value="">Choose exam</option>
+                                    {% for value,label in exam_type_choices %}
+                                        <option value="{{ value }}" {% if value == selected_exam_type %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="font-weight-semibold">Total Marks <span class="text-danger">*</span></label>
+                                <input type="number" name="total_marks" class="form-control" min="0" step="0.01" value="{{ total_marks_value|default:'' }}" required>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Roll</th>
+                                        <th>Student</th>
+                                        <th style="width: 140px;">Marks</th>
+                                        <th style="width: 120px;">Grade</th>
+                                        <th>Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for student in students %}
+                                    <tr>
+                                        <td>{{ student.roll_no|default:"—" }}</td>
+                                        <td>
+                                            <strong>{{ student.first_name }} {{ student.last_name }}</strong><br>
+                                            <small class="text-muted">{{ student.student_user_id|default:"—" }}</small>
+                                            {% if student.previous_marks %}
+                                                <div><small class="text-info">Last: {{ student.previous_marks }} {% if student.previous_grade %}({{ student.previous_grade }}){% endif %}</small></div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <input type="number" min="0" step="0.01" name="marks_{{ student.id }}" class="form-control" value="{{ student.current_marks }}">
+                                            {% if student.error_message %}
+                                                <small class="text-danger">{{ student.error_message }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <input type="text" name="grade_{{ student.id }}" class="form-control" value="{{ student.current_grade }}" maxlength="5">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="remark_{{ student.id }}" class="form-control" value="{{ student.current_remark }}" placeholder="Optional remark">
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-1"></i>Save Results
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% elif filter_submitted %}
+            <div class="alert alert-info">
+                No students were found for the selected combination. Please adjust the filters and try again.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="result-secondary-grid">
+        <div>
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Entries</h5>
+                    <span class="badge badge-light">{{ recent_results|length }} items</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_results %}
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Subject</th>
+                                    <th class="text-right">Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for result in recent_results %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ result.student.first_name }} {{ result.student.last_name }}</strong><br>
+                                        <small class="text-muted">{{ result.exam_type }} · {{ result.session.name|default:"—" }}</small>
+                                    </td>
+                                    <td>{{ result.subject.name|default:"—" }}</td>
+                                    <td class="text-right">
+                                        <span class="text-success font-weight-semibold">{{ result.obtained_marks }}</span>
+                                        <small class="text-muted">/ {{ result.total_marks }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                        <p class="mb-0">No results recorded yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="card shadow-sm mb-4 h-100">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div>
+                        <h5 class="mb-3">Need to edit marks?</h5>
+                        <p class="text-muted mb-4">
+                            Use the Manage Results page to quickly adjust previously saved entries or bulk update marks.
+                        </p>
+                    </div>
+                    <a href="{% url 'manage_results' %}" class="btn btn-outline-primary btn-block">
+                        <i class="fas fa-clipboard-list mr-1"></i>Go to Manage Results
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

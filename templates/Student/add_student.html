@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="content container-fluid">
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col">
+                <h3 class="page-title">Add Students</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="students.html">Students</a></li>
+                    <li class="breadcrumb-item active">Add Students</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="row">
+
+                            <!-- IMAGE FIELD TOP -->
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label>Student Image</label>
+                                    <input type="file" name="profile_pic" class="form-control mb-2">
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Student Information</span></h5>
+                            </div>
+
+                            <!-- First Name -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" name="first_name" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Student Id (student_user_id) -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Student Id (Auto-generated)</label>
+                                    <input type="text" class="form-control" disabled>
+                                </div>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select name="gender" class="form-control" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Date of Birth -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Date of Birth</label>
+                                    <input type="date" name="date_of_birth" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Class -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Class</label>
+                                    <select name="klass" class="form-control" required>
+                                        <option value="">Select Class</option>
+                                        {% for class in classes %}
+                                        <option value="{{ class.id }}">{{ class.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Session -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Session</label>
+                                    <select name="session" class="form-control" required>
+                                        <option value="">Select Session</option>
+                                        {% for session in sessions %}
+                                        <option value="{{ session.id }}">{{ session.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Religion (extra) -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Religion</label>
+                                    <input type="text" name="religion" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Joining Date (extra) -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Joining Date</label>
+                                    <input type="date" name="joining_date" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Mobile Number (phone) -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Mobile Number</label>
+                                    <input type="text" name="phone" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Student Email -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Student Email</label>
+                                    <input type="email" name="email" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <!-- Admission Number -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Admission Number (Auto-generated)</label>
+                                    <input type="text" class="form-control" disabled>
+                                </div>
+                            </div>
+
+                            <!-- Section -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Section</label>
+                                    <select name="section" class="form-control">
+                                        <option value="">Select Section (Optional)</option>
+                                        {% for section in sections %}
+                                        <option value="{{ section.id }}">{{ section.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Blood Group -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Blood Group</label>
+                                    <select name="blood_group" class="form-control">
+                                        <option value="">Select Blood Group</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Parent Information -->
+                            <div class="col-12">
+                                <h5 class="form-title"><span>Parent Information</span></h5>
+                            </div>
+
+                            <!-- Father's Name -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Father's Name</label>
+                                    <input type="text" name="father_name" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Father's Occupation -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Father's Occupation</label>
+                                    <input type="text" name="father_occupation" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Father's Mobile -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Father's Mobile</label>
+                                    <input type="text" name="father_mobile" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Father's Email -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Father's Email</label>
+                                    <input type="email" name="father_email" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Mother's Name -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Mother's Name</label>
+                                    <input type="text" name="mother_name" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Mother's Occupation -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Mother's Occupation</label>
+                                    <input type="text" name="mother_occupation" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Mother's Mobile -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Mother's Mobile</label>
+                                    <input type="text" name="mother_mobile" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Mother's Email -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Mother's Email</label>
+                                    <input type="email" name="mother_email" class="form-control">
+                                </div>
+                            </div>
+
+                            <!-- Present Address -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Present Address</label>
+                                    <textarea name="present_address" class="form-control"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Permanent Address -->
+                            <div class="col-12 col-sm-6">
+                                <div class="form-group">
+                                    <label>Permanent Address</label>
+                                    <textarea name="permanent_address" class="form-control"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

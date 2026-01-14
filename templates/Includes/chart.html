@@ -1,0 +1,203 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var chartSize = {
+            height: 350,
+            width: '100%'
+        };
+
+        function getSizeValue(value) {
+            return typeof value === 'number' ? value + 'px' : value;
+        }
+
+        function ensureChartContainer(selector) {
+            var el = document.querySelector(selector);
+            if (!el) {
+                return;
+            }
+
+            var heightValue = getSizeValue(chartSize.height);
+            var widthValue = getSizeValue(chartSize.width);
+
+            el.style.height = heightValue;
+            el.style.minHeight = heightValue;
+            el.style.maxHeight = heightValue;
+            el.style.width = widthValue;
+            el.style.minWidth = widthValue;
+        }
+
+        ['#all_details', '#stud_gender', '#student_gender'].forEach(ensureChartContainer);
+
+        var options = {
+            series: [{{ student_count }}, {{ teacher_count }}, {{ subject_count }}, {{ class_count }}],
+            chart: {
+                height: chartSize.height,
+                width: chartSize.width,
+                type: 'pie',
+            },
+            labels: ['Students', 'Teacher', 'Subject', 'Class'],
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }]
+        };
+
+        var chart = new ApexCharts(document.querySelector("#all_details"), options);
+        chart.render();
+
+        // Class-wise student bar chart
+        var classChart = document.querySelector('#student_gender, #stud_gender');
+        if (!classChart) {
+            return;
+        }
+
+        var classLabels = JSON.parse('{{ class_student_labels|escapejs }}');
+        var classCounts = JSON.parse('{{ class_student_counts|escapejs }}');
+
+        var optionsBar = {
+            chart: {
+                type: 'bar',
+                height: chartSize.height,
+                width: chartSize.width,
+                toolbar: {
+                    show: false
+                },
+            },
+            colors: ['#fdbb38', '#19affb', '#9b59b6', '#2ecc71', '#e74c3c', '#8e44ad', '#3498db', '#1abc9c'],
+            dataLabels: {
+                enabled: false
+            },
+            plotOptions: {
+                bar: {
+                    columnWidth: '45%',
+                    distributed: true
+                }
+            },
+            series: [{
+                name: "Students",
+                data: classCounts,
+            }],
+            xaxis: {
+                categories: classLabels,
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                },
+                labels: {
+                    style: {
+                        colors: '#777'
+                    }
+                }
+            },
+            yaxis: {
+                axisBorder: {
+                    show: false
+                },
+                axisTicks: {
+                    show: false
+                },
+                labels: {
+                    style: {
+                        colors: '#777'
+                    }
+                }
+            },
+            tooltip: {
+                y: {
+                    formatter: function (value) {
+                        return value + ' students';
+                    }
+                }
+            },
+            legend: {
+                show: false
+            }
+
+        }
+
+        var classBarChart = new ApexCharts(classChart, optionsBar);
+        classBarChart.render();
+
+
+        // student and teacher
+        var options = {
+                series: [{{student_count}}, {{teacher_count}}],
+                chart: {
+                    type: 'donut',
+                    height: chartSize.height,
+                    width: chartSize.width,
+                },
+                labels: ['Students', 'Teacher'],
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 350,
+                            width: '100%',
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            var chart = new ApexCharts(document.querySelector("#stud_teac"), options);
+            chart.render();
+
+        // class and subject
+        var options = {
+                series: [{{class_count}}, {{subject_count}}],
+                chart: {
+                    height: chartSize.height,
+                    width: chartSize.width,
+                    type: 'donut',
+                },
+                labels: ['Class', 'Subject'],
+                plotOptions: {
+                    pie: {
+                        startAngle: -90,
+                        endAngle: 270
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                fill: {
+                    type: 'gradient',
+                },
+                legend: {
+                    formatter: function (val, opts) {
+                        return val + " - " + opts.w.globals.series[opts.seriesIndex]
+                    }
+                },
+                
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }]
+            };
+
+            var chart = new ApexCharts(document.querySelector("#class_subject"), options);
+            chart.render();
+
+    
+
+    });
+</script>
